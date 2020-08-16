@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App;
 
 use App\Exception\RequestHandleException;
 use FastRoute\Dispatcher;
@@ -8,7 +8,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class RequestHandler implements RequestHandlerInterface
+class App implements RequestHandlerInterface
 {
     protected $dispatcher;
 
