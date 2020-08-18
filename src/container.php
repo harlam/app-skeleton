@@ -8,10 +8,13 @@ use Psr\Http\Server\RequestHandlerInterface;
 $container = new Container();
 
 /**
- * @return \Doctrine\DBAL\Driver\Connection
+ * @return \Doctrine\ORM\EntityManager
  */
-$container[\Doctrine\DBAL\Driver\Connection::class] = function () {
-    return \Doctrine\DBAL\DriverManager::getConnection(['url' => $_ENV['DBAL_CONNECTION_URL']]);
+$container[\Doctrine\ORM\EntityManager::class] = function () {
+    $isDevMode = $_ENV['ORM_DEVELOPMENT_MODE'] === 'true' ? true : false;
+    $config = \Doctrine\ORM\Tools\Setup::createAnnotationMetadataConfiguration(['src/Entity'], $isDevMode);
+
+    return \Doctrine\ORM\EntityManager::create(['url' => $_ENV['DBAL_CONNECTION_URL']], $config);
 };
 
 /**
