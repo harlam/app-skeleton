@@ -1,25 +1,22 @@
 <?php
 
-use Laminas\HttpHandlerRunner\Emitter\EmitterInterface;
 use Pimple\Psr11\Container;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 
 require_once __DIR__ . '/../bootstrap.php';
 
 /** @var Container $container */
 $container = require_once __APP__ . '/src/container.php';
 
-/** @var ServerRequestInterface $request */
-$request = $container->get(ServerRequestInterface::class);
+/** @var \FastRoute\Dispatcher $dispatcher */
+$dispatcher = require_once __APP__ . '/src/routes.php';
 
-/** @var RequestHandlerInterface $handler */
-$handler = $container->get(RequestHandlerInterface::class);
+/** @var ServerRequestInterface $request */
+$request = \Laminas\Diactoros\ServerRequestFactory::fromGlobals($_SERVER, $_GET, $_POST);
 
 /** @var \Psr\Http\Message\ResponseInterface $response */
-$response = $handler->handle($request);
+$response = (new \App\App($container, $dispatcher))
+    ->handle($request);
 
-/** @var EmitterInterface $emitter */
-$emitter = $container->get(EmitterInterface::class);
-
-$emitter->emit($response);
+(new \Laminas\HttpHandlerRunner\Emitter\SapiEmitter)
+    ->emit($response);
