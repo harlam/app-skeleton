@@ -14,9 +14,8 @@ use ReflectionClass;
 /**
  * Class App
  * @package App
- * @todo refactor
  */
-class App implements RequestHandlerInterface
+class Web implements RequestHandlerInterface
 {
     protected $container;
     protected $dispatcher;
@@ -32,6 +31,7 @@ class App implements RequestHandlerInterface
     }
 
     /**
+     * @todo refactor
      * @param ServerRequestInterface $request
      * @return ResponseInterface
      * @throws AppException

@@ -1,5 +1,8 @@
 <?php
 
+use App\Web;
+use Laminas\Diactoros\ServerRequestFactory;
+use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Pimple\Psr11\Container;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -12,11 +15,11 @@ $container = require_once __APP__ . '/src/container.php';
 $dispatcher = require_once __APP__ . '/src/routes.php';
 
 /** @var ServerRequestInterface $request */
-$request = \Laminas\Diactoros\ServerRequestFactory::fromGlobals($_SERVER, $_GET, $_POST);
+$request = ServerRequestFactory::fromGlobals($_SERVER, $_GET, $_POST);
 
 /** @var \Psr\Http\Message\ResponseInterface $response */
-$response = (new \App\App($container, $dispatcher))
+$response = (new Web($container, $dispatcher))
     ->handle($request);
 
-(new \Laminas\HttpHandlerRunner\Emitter\SapiEmitter)
+(new SapiEmitter)
     ->emit($response);
