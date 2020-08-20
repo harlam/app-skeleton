@@ -31,7 +31,6 @@ class Web implements RequestHandlerInterface
     }
 
     /**
-     * @todo refactor
      * @param ServerRequestInterface $request
      * @return ResponseInterface
      * @throws AppException
@@ -54,19 +53,13 @@ class Web implements RequestHandlerInterface
                 }
 
                 if (is_callable($handler)) {
-                    $response = call_user_func_array($handler, [
+                    return call_user_func_array($handler, [
                         'request' => $request,
                         'vars' => $routeInfo[2],
                     ]);
-
-                    if ($response instanceof ResponseInterface) {
-                        return $response;
-                    }
-
-                    throw new AppException('Expected ResponseInterface');
                 }
 
-                throw new AppException('Bad handler');
+                throw new AppException('Bad route handler');
             case Dispatcher::NOT_FOUND:
                 throw new RequestHandleException('Not found', 404);
             case Dispatcher::METHOD_NOT_ALLOWED:

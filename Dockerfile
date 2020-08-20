@@ -21,6 +21,6 @@ RUN apt-get update -y && apt-get upgrade -y \
     libfreetype6-dev libjpeg62-turbo-dev libzip-dev unzip ssh-client libc-client-dev libkrb5-dev \
     && apt-get clean
 
-RUN docker-php-ext-install bcmath json opcache pdo_pgsql
+RUN docker-php-ext-install bcmath opcache pdo_pgsql
 
 VOLUME /var/www/html

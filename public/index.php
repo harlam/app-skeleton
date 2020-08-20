@@ -15,7 +15,7 @@ $container = require_once __APP__ . '/src/container.php';
 $dispatcher = require_once __APP__ . '/src/routes.php';
 
 /** @var ServerRequestInterface $request */
-$request = ServerRequestFactory::fromGlobals($_SERVER, $_GET, $_POST);
+$request = ServerRequestFactory::fromGlobals($_SERVER, $_GET, $_POST, $_COOKIE, $_FILES);
 
 /** @var \Psr\Http\Message\ResponseInterface $response */
 $response = (new Web($container, $dispatcher))
