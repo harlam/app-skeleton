@@ -63,7 +63,7 @@ class Web implements RequestHandlerInterface
             case Dispatcher::NOT_FOUND:
                 throw new HttpException('Not found', 404);
             case Dispatcher::METHOD_NOT_ALLOWED:
-                throw new HttpException('Method not allowed', 405);
+                throw new HttpException('Not allowed', 405);
             default:
                 throw new AppException("Unknown action with code '{$routeInfo[0]}'");
         }
@@ -78,18 +78,24 @@ class Web implements RequestHandlerInterface
     {
         $reflection = new ReflectionClass($handler);
 
-        $instanceParams = [];
+        $constructor = $reflection->getConstructor();
+
+        if ($constructor === null) {
+            return $reflection->newInstance();
+        }
+
+        $constructorParams = [];
         /** @var \ReflectionParameter $param */
-        foreach ($reflection->getConstructor()->getParameters() as $param) {
+        foreach ($constructor->getParameters() as $param) {
             $class = $param->getClass();
 
             if ($class === null) {
                 throw new AppException('Type is required');
             }
 
-            $instanceParams[] = $this->container->get($class->getName());
+            $constructorParams[] = $this->container->get($class->getName());
         }
 
-        return $reflection->newInstanceArgs($instanceParams);
+        return $reflection->newInstanceArgs($constructorParams);
     }
 }

@@ -10,9 +10,10 @@ require_once __DIR__ . '/../bootstrap.php';
 /** @var Container $container */
 $container = require_once __APP__ . '/src/container.php';
 
-(new Whoops\Run)
-    ->pushHandler($container->get(\Whoops\Handler\HandlerInterface::class))
-    ->register();
+/** @var \Whoops\RunInterface $whoops */
+$whoops = $container->get(Whoops\RunInterface::class);
+
+$whoops->register();
 
 /** @var \FastRoute\Dispatcher $dispatcher */
 $dispatcher = require_once __APP__ . '/src/routes.php';

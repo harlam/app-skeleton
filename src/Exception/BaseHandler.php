@@ -9,28 +9,36 @@ use Whoops\Exception\Inspector;
 use Whoops\RunInterface;
 
 /**
- * Class Handler
+ * Class BaseHandler
  * @package App\Exception
  */
-final class Handler
+final class BaseHandler
 {
     private $emitter;
 
+    /**
+     * @param EmitterInterface $emitter
+     */
     public function __construct(EmitterInterface $emitter)
     {
         $this->emitter = $emitter;
     }
 
+    /**
+     * @param Throwable $throwable
+     * @param Inspector $inspector
+     * @param RunInterface $run
+     */
     public function __invoke(Throwable $throwable, Inspector $inspector, RunInterface $run)
     {
-        $response = new EmptyResponse();
+        $response = new EmptyResponse(500);
 
         switch (get_class($throwable)) {
             case HttpException::class:
-                $this->emitter->emit($response->withStatus($throwable->getCode()));
+                $this->emitter->emit($response->withStatus($throwable->getCode(), $throwable->getMessage()));
                 break;
             default:
-                $this->emitter->emit($response->withStatus(500));
+                $this->emitter->emit($response);
         }
     }
 }
