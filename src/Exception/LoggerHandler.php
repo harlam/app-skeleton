@@ -34,7 +34,7 @@ final class LoggerHandler
             $level = $throwable->getLevel();
             $context = $throwable->getContext();
         } else {
-            $level = 'warning';
+            $level = AppException::WARNING;
             $context = [];
         }
 
