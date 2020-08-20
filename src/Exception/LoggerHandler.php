@@ -38,6 +38,10 @@ final class LoggerHandler
             $context = [];
         }
 
-        $this->logger->log($level, $throwable->getMessage(), $context);
+        $message = $inspector->getExceptionName() . ' ' . $throwable->getMessage()
+            . ', File: ' . $throwable->getFile()
+            . ', Line: ' . $throwable->getLine();
+
+        $this->logger->log($level, $message, $context);
     }
 }
