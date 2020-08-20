@@ -1,5 +1,5 @@
 - Create project
-`composer create-project harlam/minimal-skeleton my-project`
+`composer create-project harlam/app-skeleton my-project`
 
 - Copy `.env.dist` to `.env` and edit
 
