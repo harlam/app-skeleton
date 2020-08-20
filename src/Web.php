@@ -3,7 +3,7 @@
 namespace App;
 
 use App\Exception\AppException;
-use App\Exception\RequestHandleException;
+use App\Exception\HttpException;
 use FastRoute\Dispatcher;
 use Pimple\Psr11\Container;
 use Psr\Http\Message\ResponseInterface;
@@ -34,7 +34,7 @@ class Web implements RequestHandlerInterface
      * @param ServerRequestInterface $request
      * @return ResponseInterface
      * @throws AppException
-     * @throws RequestHandleException
+     * @throws HttpException
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
@@ -61,11 +61,11 @@ class Web implements RequestHandlerInterface
 
                 throw new AppException('Bad route handler');
             case Dispatcher::NOT_FOUND:
-                throw new RequestHandleException('Not found', 404);
+                throw new HttpException('Not found', 404);
             case Dispatcher::METHOD_NOT_ALLOWED:
-                throw new RequestHandleException('Method not allowed', 405);
+                throw new HttpException('Method not allowed', 405);
             default:
-                throw new RequestHandleException("Unknown action with code '{$routeInfo[0]}'");
+                throw new AppException("Unknown action with code '{$routeInfo[0]}'");
         }
     }
 

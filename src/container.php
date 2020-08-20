@@ -16,6 +16,28 @@ $container[\Doctrine\ORM\EntityManager::class] = function () {
 };
 
 /**
+ * @param Container $container
+ * @return \Whoops\Handler\HandlerInterface
+ */
+$container[\Whoops\Handler\HandlerInterface::class] = function (Container $container) {
+    if ($_ENV['APP_ENVIRONMENT'] === 'development') {
+        $handler = new \Whoops\Handler\PrettyPageHandler();
+    } else {
+        /** @var \Laminas\HttpHandlerRunner\Emitter\EmitterInterface $emitter */
+        $emitter = $container[\Laminas\HttpHandlerRunner\Emitter\EmitterInterface::class];
+        $handler = new \Whoops\Handler\CallbackHandler(new \App\Exception\Handler($emitter));
+    }
+    return $handler;
+};
+
+/**
+ * @return \Laminas\HttpHandlerRunner\Emitter\SapiEmitter
+ */
+$container[\Laminas\HttpHandlerRunner\Emitter\EmitterInterface::class] = function () {
+    return new \Laminas\HttpHandlerRunner\Emitter\SapiEmitter();
+};
+
+/**
  * Service example
  * @return \App\Service\Service
  */

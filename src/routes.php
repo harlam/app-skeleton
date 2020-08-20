@@ -5,4 +5,5 @@ use function FastRoute\simpleDispatcher;
 
 return simpleDispatcher(function (RouteCollector $router) {
     $router->addRoute('GET', '/', \App\Controller\Index::class);
+    $router->addRoute('GET', '/error', \App\Controller\Error::class);
 });
