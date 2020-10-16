@@ -18,12 +18,14 @@ $whoops->register();
 /** @var \FastRoute\Dispatcher $dispatcher */
 $dispatcher = require_once __APP__ . '/src/routes.php';
 
+$resolver = new \App\Resolver($container);
+
 /** @var ServerRequestInterface $request */
 $request = ServerRequestFactory::fromGlobals($_SERVER, $_GET, $_POST, $_COOKIE, $_FILES);
 
 /** @var \Psr\Http\Message\ResponseInterface $response */
-$response = (new Web($container, $dispatcher))
-    ->handle($request);
+$response = (new Web($container, $dispatcher, $resolver))
+    ->run($request);
 
 /** @var \Laminas\HttpHandlerRunner\Emitter\EmitterInterface $emitter */
 $emitter = $container->get(\Laminas\HttpHandlerRunner\Emitter\EmitterInterface::class);

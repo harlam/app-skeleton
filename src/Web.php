@@ -10,6 +10,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use ReflectionClass;
+use ReflectionException;
+use Relay\Relay;
 
 /**
  * Class App
@@ -19,15 +21,18 @@ class Web implements RequestHandlerInterface
 {
     protected $container;
     protected $dispatcher;
+    protected $resolver;
 
     /**
      * @param Container $container
      * @param Dispatcher $dispatcher
+     * @param ResolverInterface $resolver
      */
-    public function __construct(Container $container, Dispatcher $dispatcher)
+    public function __construct(Container $container, Dispatcher $dispatcher, ResolverInterface $resolver)
     {
         $this->container = $container;
         $this->dispatcher = $dispatcher;
+        $this->resolver = $resolver;
     }
 
     /**
@@ -36,30 +41,40 @@ class Web implements RequestHandlerInterface
      * @throws AppException
      * @throws HttpException
      */
-    public function handle(ServerRequestInterface $request): ResponseInterface
+    public function run(ServerRequestInterface $request): ResponseInterface
     {
         $routeInfo = $this->dispatcher->dispatch($request->getMethod(), $request->getUri()->getPath());
         switch ($routeInfo[0]) {
             case Dispatcher::FOUND:
-                /** @var callable|string $handler */
+                foreach ($routeInfo[2] as $param => $value) {
+                    $request = $request->withAttribute($param, $value);
+                }
+
+                /** @var array $handler */
                 $handler = $routeInfo[1];
 
-                if (is_string($handler)) {
-                    if ($this->container->has($handler)) {
-                        $handler = $this->container->get($handler);
-                    } else {
-                        $handler = $this->buildHandlerReflection($handler);
-                    }
-                }
+                $chain = $handler[1];
+                $chain[] = $handler[0];
 
-                if (is_callable($handler)) {
-                    return call_user_func_array($handler, [
-                        'request' => $request,
-                        'vars' => $routeInfo[2],
-                    ]);
-                }
+                $relay = new Relay($chain, function (string $entry) {
+                    return $this->resolver->resolve($entry);
+                });
 
-                throw new AppException('Bad route handler');
+                return $relay->handle($request);
+
+//                $action = $handler[0];
+//                if (is_string($action)) {
+//                    $action = $this->resolver->resolve($action);
+//                }
+//
+//                if (is_callable($action)) {
+//                    return call_user_func_array($action, [
+//                        'request' => $request,
+//                        'vars' => $routeInfo[2],
+//                    ]);
+//                }
+
+//                throw new AppException('Bad route handler');
             case Dispatcher::NOT_FOUND:
                 throw new HttpException('Not found', 404);
             case Dispatcher::METHOD_NOT_ALLOWED:
@@ -69,33 +84,20 @@ class Web implements RequestHandlerInterface
         }
     }
 
-    /**
-     * @param string $handler
-     * @return object
-     * @throws AppException
-     */
-    protected function buildHandlerReflection(string $handler)
+    protected function processMiddleware()
     {
-        $reflection = new ReflectionClass($handler);
 
-        $constructor = $reflection->getConstructor();
+    }
 
-        if ($constructor === null) {
-            return $reflection->newInstance();
-        }
+    /**
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface
+     * @throws AppException
+     * @throws HttpException
+     * @throws ReflectionException
+     */
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {
 
-        $constructorParams = [];
-        /** @var \ReflectionParameter $param */
-        foreach ($constructor->getParameters() as $param) {
-            $class = $param->getClass();
-
-            if ($class === null) {
-                throw new AppException('Type is required');
-            }
-
-            $constructorParams[] = $this->container->get($class->getName());
-        }
-
-        return $reflection->newInstanceArgs($constructorParams);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Action\Main;
 
 use App\Exception\AppException;
 
