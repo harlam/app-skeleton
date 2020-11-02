@@ -1,7 +1,10 @@
 <?php
 
-use App\Web;
+use FastRoute\Dispatcher;
 use Laminas\Diactoros\ServerRequestFactory;
+use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
+use Mfw\Resolver;
+use Mfw\WebApp;
 use Pimple\Psr11\Container;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -15,20 +18,17 @@ $whoops = $container->get(Whoops\RunInterface::class);
 
 $whoops->register();
 
-/** @var \FastRoute\Dispatcher $dispatcher */
+/** @var Dispatcher $dispatcher */
 $dispatcher = require_once __APP__ . '/src/routes.php';
-
-$resolver = new \App\Resolver($container);
+$middlewares = require_once __APP__ . '/src/middlewares.php';
 
 /** @var ServerRequestInterface $request */
 $request = ServerRequestFactory::fromGlobals($_SERVER, $_GET, $_POST, $_COOKIE, $_FILES);
 
-/** @var \Psr\Http\Message\ResponseInterface $response */
-$response = (new Web($container, $dispatcher, $resolver))
-    ->run($request);
+$resolver = new Resolver($container);
+$handler = new WebApp($dispatcher, $resolver, $middlewares);
 
-/** @var \Laminas\HttpHandlerRunner\Emitter\EmitterInterface $emitter */
-$emitter = $container->get(\Laminas\HttpHandlerRunner\Emitter\EmitterInterface::class);
+$response = $handler->handle($request);
 
-$emitter
+(new SapiEmitter())
     ->emit($response);

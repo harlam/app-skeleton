@@ -2,6 +2,7 @@
 
 namespace App\Exception;
 
+use Mfw\Exception\AppException;
 use Psr\Log\LoggerInterface;
 use Throwable;
 use Whoops\Exception\Inspector;
@@ -11,7 +12,7 @@ use Whoops\RunInterface;
  * Class LoggerHandler
  * @package App\Exception
  */
-final class LoggerHandler
+final class ExceptionHandler
 {
     private $logger;
 
@@ -31,10 +32,8 @@ final class LoggerHandler
     public function __invoke(Throwable $throwable, Inspector $inspector, RunInterface $run)
     {
         if ($throwable instanceof AppException) {
-            $level = $throwable->getLevel();
             $context = $throwable->getContext();
         } else {
-            $level = AppException::WARNING;
             $context = [];
         }
 
@@ -42,6 +41,6 @@ final class LoggerHandler
             . ', File: ' . $throwable->getFile()
             . ', Line: ' . $throwable->getLine();
 
-        $this->logger->log($level, $message, $context);
+        $this->logger->error($message, $context);
     }
 }

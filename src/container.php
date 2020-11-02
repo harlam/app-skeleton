@@ -1,67 +1,68 @@
 <?php
 
+use App\Exception\ExceptionHandler;
+use App\Service\Service;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\Setup;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+use Monolog\Processor\WebProcessor;
 use Pimple\Container;
 use Pimple\Psr11\Container as Psr11Container;
+use Psr\Log\LoggerInterface;
+use Whoops\Handler\CallbackHandler;
+use Whoops\Handler\HandlerInterface;
+use Whoops\Handler\PrettyPageHandler;
+use Whoops\RunInterface;
 
 $container = new Container();
 
 /**
  * @param Container $container
- * @return \Whoops\RunInterface
+ * @return RunInterface
  */
-$container[\Whoops\RunInterface::class] = function (Container $container) {
+$container[RunInterface::class] = function (Container $container) {
+    $whoops = new Whoops\Run();
+
     if ($_ENV['APP_ENVIRONMENT'] === 'development') {
-        /** @var \Whoops\Handler\HandlerInterface $handler Show pretty in development mode */
-        $handler = new \Whoops\Handler\PrettyPageHandler();
-    } else {
-        /** @var \Laminas\HttpHandlerRunner\Emitter\EmitterInterface $emitter */
-        $emitter = $container[\Laminas\HttpHandlerRunner\Emitter\EmitterInterface::class];
-        /** @var \Whoops\Handler\HandlerInterface $handler Show minimal details in production */
-        $handler = new \Whoops\Handler\CallbackHandler(new \App\Exception\BaseHandler($emitter));
+        /** @var HandlerInterface $handler Show pretty in development mode */
+        return $whoops->pushHandler(new PrettyPageHandler());
     }
 
-    /** @var \Psr\Log\LoggerInterface $logger Log all exceptions always */
-    $logger = $container[\Psr\Log\LoggerInterface::class];
-    $loggerHandler = new \Whoops\Handler\CallbackHandler(new \App\Exception\LoggerHandler($logger));
+    /** @var LoggerInterface $logger Log all exceptions */
+    $logger = $container[LoggerInterface::class];
 
-    return (new Whoops\Run())
-        ->pushHandler($handler)
-        ->pushHandler($loggerHandler);
+    $handler = new CallbackHandler(new ExceptionHandler($logger));
+
+    return $whoops->pushHandler($handler);
 };
 
 /**
- * @return \Monolog\Logger
+ * @return LoggerInterface
  */
-$container[\Psr\Log\LoggerInterface::class] = function () {
+$container[LoggerInterface::class] = function () {
     $level = $_ENV['APP_LOG_LEVEL'] === null ? 'info' : $_ENV['APP_LOG_LEVEL'];
-    return (new \Monolog\Logger('app'))
-        ->pushHandler(new \Monolog\Handler\StreamHandler(__APP__ . '/runtime/app.log', $level))
-        ->pushProcessor(new \Monolog\Processor\WebProcessor());
+    return (new Logger('app'))
+        ->pushHandler(new StreamHandler(__APP__ . '/runtime/app.log', $level))
+        ->pushProcessor(new WebProcessor());
 };
 
 /**
- * @return \Laminas\HttpHandlerRunner\Emitter\SapiEmitter
+ * @return EntityManager
  */
-$container[\Laminas\HttpHandlerRunner\Emitter\EmitterInterface::class] = function () {
-    return new \Laminas\HttpHandlerRunner\Emitter\SapiEmitter();
-};
-
-/**
- * @return \Doctrine\ORM\EntityManager
- */
-$container[\Doctrine\ORM\EntityManager::class] = function () {
+$container[EntityManager::class] = function () {
     $isDevMode = $_ENV['ORM_DEVELOPMENT_MODE'] === 'true' ? true : false;
-    $config = \Doctrine\ORM\Tools\Setup::createAnnotationMetadataConfiguration(['src/Entity'], $isDevMode);
+    $config = Setup::createAnnotationMetadataConfiguration(['src/Entity'], $isDevMode);
 
-    return \Doctrine\ORM\EntityManager::create(['url' => $_ENV['DBAL_CONNECTION_URL']], $config);
+    return EntityManager::create(['url' => $_ENV['DBAL_CONNECTION_URL']], $config);
 };
 
 /**
  * Service example
- * @return \App\Service\Service
+ * @return Service
  */
-$container[\App\Service\Service::class] = function () {
-    return new \App\Service\Service();
+$container[Service::class] = function () {
+    return new Service();
 };
 
 return new Psr11Container($container);

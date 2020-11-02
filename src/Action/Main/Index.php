@@ -4,6 +4,7 @@ namespace App\Action\Main;
 
 use App\Service\Service;
 use Laminas\Diactoros\Response\JsonResponse;
+use Psr\Http\Message\ServerRequestInterface;
 
 class Index
 {
@@ -14,8 +15,12 @@ class Index
         $this->service = $service;
     }
 
-    public function __invoke()
+    /**
+     * @param ServerRequestInterface $request
+     * @return JsonResponse
+     */
+    public function __invoke(ServerRequestInterface $request)
     {
-        return new JsonResponse([$this->service->index()]);
+        return new JsonResponse([$this->service->index(), 'attributes' => $request->getAttributes()]);
     }
 }
