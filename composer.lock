@@ -1284,16 +1284,16 @@
         },
         {
             "name": "harlam/php-minimal",
-            "version": "v1.0.1",
+            "version": "v1.0.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/harlam/phpfw-minimal.git",
-                "reference": "f039e8b7869ca8515a196281e0ced656238c4550"
+                "url": "https://github.com/harlam/php-minimal.git",
+                "reference": "7caafe2bfc6afe3d5687caf276d17dccca1efce8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/harlam/phpfw-minimal/zipball/f039e8b7869ca8515a196281e0ced656238c4550",
-                "reference": "f039e8b7869ca8515a196281e0ced656238c4550",
+                "url": "https://api.github.com/repos/harlam/php-minimal/zipball/7caafe2bfc6afe3d5687caf276d17dccca1efce8",
+                "reference": "7caafe2bfc6afe3d5687caf276d17dccca1efce8",
                 "shasum": ""
             },
             "require": {
@@ -1322,10 +1322,10 @@
             ],
             "description": "PHP framework",
             "support": {
-                "issues": "https://github.com/harlam/phpfw-minimal/issues",
-                "source": "https://github.com/harlam/phpfw-minimal/tree/v1.0.1"
+                "issues": "https://github.com/harlam/php-minimal/issues",
+                "source": "https://github.com/harlam/php-minimal/tree/v1.0.2"
             },
-            "time": "2020-11-02T10:25:02+00:00"
+            "time": "2020-11-06T05:52:37+00:00"
         },
         {
             "name": "laminas/laminas-diactoros",
