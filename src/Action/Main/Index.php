@@ -21,6 +21,10 @@ class Index
      */
     public function __invoke(ServerRequestInterface $request)
     {
-        return new JsonResponse([$this->service->index(), 'attributes' => $request->getAttributes()]);
+        return new JsonResponse([
+            'action' => $this->service->index(),
+            'attributes' => $request->getAttributes(),
+            'demo-header' => $request->getHeaderLine('X-Demo')
+        ]);
     }
 }
