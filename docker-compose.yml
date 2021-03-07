@@ -6,8 +6,6 @@ services:
     build:
       dockerfile: Dockerfile
       context: .
-      args:
-        - GITHUB_TOKEN=${GITHUB_TOKEN}
     environment:
       - FPM_RUN_USER=${FPM_RUN_USER}
       - FPM_RUN_GROUP=${FPM_RUN_GROUP}
@@ -15,13 +13,5 @@ services:
       - .:/var/www/html
     expose:
       - 9000
-    networks:
-      self:
-        ipv4_address: ${NETWORK_APP_IP}
-
-networks:
-  self:
-    driver: bridge
-    ipam:
-      config:
-      - subnet: ${NETWORK_SUBNET}
+    ports:
+      - ${APP_FPM_ADDR}:9000

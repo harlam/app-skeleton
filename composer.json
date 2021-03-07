@@ -10,7 +10,7 @@
   ],
   "require": {
     "php": ">=7.3",
-    "harlam/php-minimal": "^1.0",
+    "harlam/php-minimal": "^1.1",
     "pimple/pimple": "^3.3",
     "vlucas/phpdotenv": "^5.1",
     "laminas/laminas-diactoros": "^2.3",

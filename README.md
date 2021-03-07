@@ -9,8 +9,8 @@
 - Run container
 `docker-compose up`
 
-- Install composer requirements
-```docker-compose exec --user=`id -u`:`id -g` app composer install```
+- Init project
+```docker.sh init``` or with composer args ```docker.sh init --no-dev```
 
 - Nginx example config
 ```
@@ -18,7 +18,7 @@ server {
     listen 80;
     server_name my-project.local;
 
-    set $app_fpm "172.72.51.2:9000";
+    set $app_fpm "127.0.0.1:9009";
     set $host_path "/projects/my-project";
     set $container_path "/var/www/html";
     set $app_path "/public";

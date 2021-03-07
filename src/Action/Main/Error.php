@@ -2,7 +2,7 @@
 
 namespace App\Action\Main;
 
-use App\Exception\AppException;
+use Mfw\Exception\CoreException;
 
 /**
  * Class Error
@@ -10,10 +10,12 @@ use App\Exception\AppException;
  */
 class Error
 {
+    /**
+     * @throws CoreException
+     */
     public function __invoke()
     {
-        throw (new AppException('Demo exception'))
-            ->setLevel(AppException::WARNING)
+        throw (new CoreException('Demo exception'))
             ->setContext(['context' => 'value']);
     }
 }

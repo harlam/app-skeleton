@@ -2,7 +2,7 @@
 
 namespace App\Exception;
 
-use Mfw\Exception\AppException;
+use Mfw\Exception\CoreException;
 use Psr\Log\LoggerInterface;
 use Throwable;
 use Whoops\Exception\Inspector;
@@ -31,7 +31,7 @@ final class ExceptionHandler
      */
     public function __invoke(Throwable $throwable, Inspector $inspector, RunInterface $run)
     {
-        if ($throwable instanceof AppException) {
+        if ($throwable instanceof CoreException) {
             $context = $throwable->getContext();
         } else {
             $context = [];

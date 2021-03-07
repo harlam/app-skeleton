@@ -2,27 +2,33 @@
 
 namespace App\Action\Main;
 
-use App\Service\Service;
+use App\Interfaces\IdentityInterface;
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ServerRequestInterface;
 
+/**
+ * Class Index
+ * @package App\Action\Main
+ */
 class Index
 {
-    protected $service;
+    protected $identity;
 
-    public function __construct(Service $service)
+    public function __construct(IdentityInterface $identity)
     {
-        $this->service = $service;
+        $this->identity = $identity;
     }
 
     /**
      * @param ServerRequestInterface $request
      * @return JsonResponse
      */
-    public function __invoke(ServerRequestInterface $request)
+    public function __invoke(ServerRequestInterface $request): JsonResponse
     {
+        $username = $this->identity->getIdentity() === null ? 'no identity' : $this->identity->getIdentity()->getUsername();
+
         return new JsonResponse([
-            'action' => $this->service->index(),
+            'identity-username' => $username,
             'attributes' => $request->getAttributes(),
             'demo-header' => $request->getHeaderLine('X-Demo')
         ]);
