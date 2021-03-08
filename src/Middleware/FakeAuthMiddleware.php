@@ -4,6 +4,7 @@ namespace App\Middleware;
 
 use App\Entity\FakeIdentity;
 use App\Interfaces\IdentityInterface;
+use App\Interfaces\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -16,10 +17,12 @@ use Psr\Http\Server\RequestHandlerInterface;
 class FakeAuthMiddleware implements MiddlewareInterface
 {
     protected $identity;
+    protected $responseFactory;
 
-    public function __construct(IdentityInterface $identity)
+    public function __construct(IdentityInterface $identity, ResponseFactoryInterface $responseFactory)
     {
         $this->identity = $identity;
+        $this->responseFactory = $responseFactory;
     }
 
     /**
@@ -30,6 +33,11 @@ class FakeAuthMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $this->identity->init(new FakeIdentity('demo', 'secret'));
+
+        $response = $this->responseFactory->getResponse()
+            ->withHeader('X-Authorized', 'success');
+
+        $this->responseFactory->setResponse($response);
 
         return $handler->handle($request->withHeader('X-Demo', 'Demo-Value'));
     }

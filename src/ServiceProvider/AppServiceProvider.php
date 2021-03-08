@@ -4,7 +4,9 @@ namespace App\ServiceProvider;
 
 use App\Exception\ExceptionHandler;
 use App\Interfaces\IdentityInterface;
+use App\Interfaces\ResponseFactoryInterface;
 use App\Service\Identity;
+use App\Service\ResponseFactory;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
 use Monolog\Handler\StreamHandler;
@@ -29,6 +31,7 @@ class AppServiceProvider implements ServiceProviderInterface
      * @param Container $pimple
      *
      * @see \App\Interfaces\IdentityInterface
+     * @see \App\Interfaces\ResponseFactoryInterface
      * @see \Psr\Log\LoggerInterface
      * @see \Doctrine\ORM\EntityManager
      * @see \Whoops\RunInterface
@@ -37,6 +40,10 @@ class AppServiceProvider implements ServiceProviderInterface
     {
         $pimple[IdentityInterface::class] = function () {
             return new Identity();
+        };
+
+        $pimple[ResponseFactoryInterface::class] = function () {
+            return new ResponseFactory();
         };
 
         $pimple[LoggerInterface::class] = function () {

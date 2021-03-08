@@ -6,6 +6,10 @@ use App\Interfaces\IdentityInterface;
 use App\Interfaces\UserInterface;
 use Exception;
 
+/**
+ * Class Identity
+ * @package App\Service
+ */
 class Identity implements IdentityInterface
 {
     protected $identity;

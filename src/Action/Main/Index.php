@@ -3,6 +3,7 @@
 namespace App\Action\Main;
 
 use App\Interfaces\IdentityInterface;
+use App\Interfaces\ResponseFactoryInterface;
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -13,10 +14,12 @@ use Psr\Http\Message\ServerRequestInterface;
 class Index
 {
     protected $identity;
+    protected $responseFactory;
 
-    public function __construct(IdentityInterface $identity)
+    public function __construct(IdentityInterface $identity, ResponseFactoryInterface $responseFactory)
     {
         $this->identity = $identity;
+        $this->responseFactory = $responseFactory;
     }
 
     /**
@@ -27,7 +30,7 @@ class Index
     {
         $username = $this->identity->getIdentity() === null ? 'no identity' : $this->identity->getIdentity()->getUsername();
 
-        return new JsonResponse([
+        return $this->responseFactory->getResponse()->withPayload([
             'identity-username' => $username,
             'attributes' => $request->getAttributes(),
             'demo-header' => $request->getHeaderLine('X-Demo')
